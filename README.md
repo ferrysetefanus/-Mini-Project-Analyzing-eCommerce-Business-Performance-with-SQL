@@ -1,3 +1,5 @@
+# Mini Project Analyzing eCommerce Business Performance with SQL
+
 1. Data preparation :
 - Create a new database and its tables for the data that has been prepared
 - Importing csv data into the database

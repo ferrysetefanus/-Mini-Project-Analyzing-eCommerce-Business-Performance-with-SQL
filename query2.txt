@@ -1,0 +1,78 @@
+--average monthly active user per tahun
+WITH mau_cte as (
+	select count(distinct customers.customers_id) as monthly_average_users,
+	   date_part('month',orders.order_purchase_timestamp) as month,
+	   date_part('year',orders.order_purchase_timestamp) as year
+	from orders
+	join customers on customers.customers_id = orders.customer_id 
+	group by year,month
+	order by year, month
+)
+
+select year, round(avg(monthly_average_users),0) 
+from mau_cte
+group by 1 
+order by 1
+
+-------------------------------------
+
+--total customer baru per tahun
+with new_customer_cte as (
+	select customers.customers_unique_id as c,
+		   date_part('year',min(orders.order_purchase_timestamp)) as first_order_year
+	from orders
+	join customers on customers.customers_id = orders.customer_id
+	group by c
+)
+
+
+select first_order_year, count(c) 
+from new_customer_cte
+group by 1 
+order by 1
+
+
+---------------------------------------
+
+-- jumlah customer yang melakukan repeat order
+with repeat_order_cte as (
+	select date_part('year', o.order_purchase_timestamp) as years,
+		   c.customers_unique_id as customer,
+		   count(1) as repeat_order
+	from orders o
+	join customers c on c.customers_id = o.customer_id
+	group by 1,2
+	having count(customers_unique_id) > 1
+)
+
+select years, count(repeat_order) as repeat_order
+from repeat_order_cte
+group by 1
+order by 1
+
+-------------------------------------
+
+--rata - rata frekuensi order tiap tahun
+with avg_order_cte as(
+	select date_part('year', o.order_purchase_timestamp) as years,
+		   c.customers_unique_id as customers,
+		   count(1) as customer
+	from orders o
+	join customers c on c.customers_id = o.customer_id
+	group by 1,2
+)
+
+select years, round(avg(customer),3) as avg_order_per_customer
+from avg_order_cte
+group by 1
+order by 1
+
+-------------------------------------
+
+-- master table
+
+select m.years, n.new_customers, r.customers_ro, a.customer_average_order 
+from average_monthly_users m
+inner join total_new_customers n on m.years = n.years
+inner join repeat_order_customers r on n.years = r.years
+inner join customer_average_order a on r.years = a.years

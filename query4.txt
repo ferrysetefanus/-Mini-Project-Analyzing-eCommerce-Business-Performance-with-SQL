@@ -1,0 +1,32 @@
+-- table all time favorite
+select op.payment_type,
+	   count(1) as jumlah_pemakaian
+	from order_payments op
+	join orders o on o.order_id = op.order_id
+	group by 1
+	order by 2 desc
+
+-------------------------
+--tabel per year
+with payment_type as (
+select date_part('year', o.order_purchase_timestamp) as year,
+		   op.payment_type,
+		   count(1) as jumlah_pemakaian
+	from order_payments op
+	join orders o on o.order_id = op.order_id
+	group by 1,2
+)
+
+select payment_type,
+	   sum(case when year = '2016' then jumlah_pemakaian else 0 end) as tahun_2016,
+	   sum(case when year = '2017' then jumlah_pemakaian else 0 end) as tahun_2017,
+	   sum(case when year = '2018' then jumlah_pemakaian else 0 end) as tahun_2018
+from payment_type
+group by 1
+order by 2 desc
+
+-----------------------------
+
+
+	   
+

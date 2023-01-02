@@ -20,9 +20,3 @@
 4. Annual Payment Type Usage Analysis :
 - Displays the total usage of each type of payment at all times, sorted from the favorite
 - Displays detailed information on the amount of usage for each type of payment for each year
-
-Tools used :
-- PostgreSQL
-- Google Colab
-- Matplotlib
-- Seaborn
